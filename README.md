@@ -72,7 +72,7 @@
 
 ## TO START THE SERVER:
 ### Backend :
-`
+`code
 cd backend
 npm install
 npm run dev
