@@ -67,3 +67,19 @@
 
 - Geolocation-Based Recommendations:
 "As a user, I want to see job opportunities near my location for convenience."
+
+
+
+## TO START THE SERVER:
+### Backend :
+`
+cd backend
+npm install
+npm run dev
+`
+### Frontend:
+`
+cd frontend
+npm install
+npm run dev
+`
