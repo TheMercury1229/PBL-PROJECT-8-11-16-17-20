@@ -70,16 +70,93 @@
 
 
 
-## TO START THE SERVER:
-### Backend :
-`code
-cd backend
-npm install
-npm run dev
-`
-### Frontend:
-`
-cd frontend
-npm install
-npm run dev
-`
+# Project Setup and Instructions
+
+This guide will help you set up and run the **backend** and **frontend** servers for this project.
+
+---
+
+## Prerequisites
+
+Ensure the following are installed on your system:
+
+- **Node.js** (v14 or later)
+- **npm** (Node Package Manager)
+- Any **code editor** (e.g., VS Code)
+
+---
+
+## Setting Up the Repository
+
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/TheMercury1229/PBL-PROJECT-8-11-16-17-20
+   ```
+
+2. **Navigate to the Project Directory**:
+
+3. **Install Dependencies**:
+   - Navigate to both the `backend` and `frontend` directories separately and run:
+     ```bash
+     npm install
+     ```
+
+---
+
+## Starting the Servers
+
+### Backend
+
+1. Navigate to the `backend` directory:
+   ```bash
+   cd backend
+   ```
+
+2. Install dependencies (if not done earlier):
+   ```bash
+   npm install
+   ```
+
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+   The backend server should now be running.
+
+---
+
+### Frontend
+
+1. Navigate to the `frontend` directory:
+   ```bash
+   cd frontend
+   ```
+
+2. Install dependencies (if not done earlier):
+   ```bash
+   npm install
+   ```
+
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+   The frontend server should now be running.
+
+---
+
+## Accessing the Application
+
+- **Frontend**: Visit `http://localhost:3000` in your browser.  
+- **Backend**: The backend server will run on the port specified in the backend configuration (e.g., `http://localhost:5000`).
+
+---
+
+## Additional Notes
+
+- If there are any environment variables required, ensure to set them up in `.env` files located in both `backend` and `frontend` directories.  
+
+
+
