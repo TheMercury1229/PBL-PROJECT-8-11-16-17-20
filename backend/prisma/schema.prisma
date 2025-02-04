@@ -8,65 +8,85 @@ datasource db {
 }
 
 model User {
-  id        String     @id @default(cuid())
-  fullName  String
-  email     String     @unique
-  mobile    BigInt     @unique
-  password  String
-  role      UserRole
-  jobSeeker JobSeeker?
+  id           String        @id @default(cuid())
+  fullName     String
+  email        String        @unique
+  mobile       String        @unique
+  password     String
+  role         UserRole
+  jobSeeker    JobSeeker?
+  jobRecruiter JobRecruiter?
 }
 
 model JobSeeker {
-  id      String       @id @default(cuid())
-  age     Int
-  gender  UserGender
-  user    User         @relation(fields: [userId], references: [id])
-  userId  String       @unique
-  profile UserProfile?
+  id            String         @id @default(cuid())
+  age           Int
+  gender        UserGender
+  user          User           @relation(fields: [userId], references: [id])
+  userId        String         @unique
+  profile       UserProfile?
+  preferredJobs PreferredJob[]
+  appliedJobs   RecruiterJob[] // Corrected relation
 }
 
 model UserProfile {
-  id            String             @id @default(cuid())
-  jobSeekerId   String             @unique
-  jobSeeker     JobSeeker          @relation(fields: [jobSeekerId], references: [id])
-  education     String
-  experience    String
-  skills        UserSkillMapping[]
-  preferredJobs PreferredJob[]
+  id          String    @id @default(cuid())
+  jobSeekerId String    @unique
+  jobSeeker   JobSeeker @relation(fields: [jobSeekerId], references: [id])
+  education   String
+  experience  String
 }
 
 model PreferredJob {
-  id          String      @id @default(cuid())
+  id          String             @id @default(cuid())
   mlJobId     String
-  mlJob       MLJob       @relation(fields: [mlJobId], references: [id])
-  profileId   String
-  userProfile UserProfile @relation(fields: [profileId], references: [id])
+  mlJob       MLJob              @relation(fields: [mlJobId], references: [id])
+  jobSeekerId String
+  jobSeeker   JobSeeker          @relation(fields: [jobSeekerId], references: [id])
+  skills      UserSkillMapping[]
 }
 
 model MLSkill {
-  id                String             @id @default(cuid())
-  name              String
-  mlJobId           String
-  mlJob             MLJob              @relation(fields: [mlJobId], references: [id])
-  userSkillMappings UserSkillMapping[]
+  id               String             @id @default(cuid())
+  name             String
+  mlJobId          String
+  mlJob            MLJob              @relation(fields: [mlJobId], references: [id])
+  UserSkillMapping UserSkillMapping[]
 }
 
 model UserSkillMapping {
-  id          String      @id @default(cuid())
-  profileId   String
-  userProfile UserProfile @relation(fields: [profileId], references: [id])
-  skills      MLSkill[]
+  id             String       @id @default(cuid())
+  skillId        String
+  skill          MLSkill      @relation(fields: [skillId], references: [id]) // One-to-One
+  preferredJobId String
+  preferredJob   PreferredJob @relation(fields: [preferredJobId], references: [id])
 }
 
 model MLJob {
   id             String         @id @default(cuid())
   title          String
   description    String?
-  skills         MLSkill[]
   salary         Int
   employmentType EmploymentType
+  skills         MLSkill[] // Static list of skills required for this job
   preferredJobs  PreferredJob[]
+  recruiterJobs  RecruiterJob[]
+}
+
+model RecruiterJob {
+  id             String       @id @default(cuid())
+  jobRecruiterId String
+  jobRecruiter   JobRecruiter @relation(fields: [jobRecruiterId], references: [id])
+  mlJobId        String
+  mlJob          MLJob        @relation(fields: [mlJobId], references: [id])
+  appliedUsers   JobSeeker[]
+}
+
+model JobRecruiter {
+  id            String         @id @default(cuid())
+  userId        String         @unique
+  user          User           @relation(fields: [userId], references: [id])
+  recruiterJobs RecruiterJob[]
 }
 
 enum UserRole {
