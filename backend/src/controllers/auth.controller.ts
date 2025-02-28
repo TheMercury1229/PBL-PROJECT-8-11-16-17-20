@@ -2,7 +2,7 @@ import { NextFunction, Request, Response, RequestHandler } from "express";
 import bcrypt from "bcryptjs";
 import db from "../config/db";
 import { createTokenAndSetCookie } from "../lib/createTokenAndSetCookie";
-import { UserRole } from "@prisma/client";
+import { UserGender, UserRole } from "@prisma/client";
 
 // /api/auth/register -> POST
 export const register: RequestHandler = async (
@@ -130,7 +130,7 @@ export const login: RequestHandler = async (
       return;
     }
     // Create a JWT token
-    createTokenAndSetCookie(findUserInDb.id, res);
+   await createTokenAndSetCookie(findUserInDb.id, res);
     res.status(200).json({
       success: true,
       message: "User logged in successfully",
@@ -201,8 +201,12 @@ export const onboard: RequestHandler = async (
       res.status(200).json({
         success: true,
         message: "Onboarded as Job Recruiter",
+        data: {
+          userId,
+          role,
+        },
       });
-      createTokenAndSetCookie(userId, res);
+      await createTokenAndSetCookie(userId, res);
       return;
     }
 
@@ -225,10 +229,19 @@ export const onboard: RequestHandler = async (
         });
 
         let jobSeekerId: string;
-
+        const genderUser =
+          gender == "MALE"
+            ? UserGender.MALE
+            : gender === "FEMALE"
+            ? UserGender.FEMALE
+            : UserGender.OTHER;
         if (!existingSeeker) {
           const newJobSeeker = await tx.jobSeeker.create({
-            data: { userId, age, gender },
+            data: {
+              userId,
+              age,
+              gender: genderUser,
+            },
           });
           jobSeekerId = newJobSeeker.id;
         } else {
@@ -250,12 +263,20 @@ export const onboard: RequestHandler = async (
           });
         }
       });
+      await createTokenAndSetCookie(userId, res);
 
       res.status(200).json({
         success: true,
         message: "Onboarded as Job Seeker",
+        data: {
+          userId,
+          role,
+          age,
+          gender,
+          education,
+          experience,
+        },
       });
-      createTokenAndSetCookie(userId, res);
       return;
     }
 
