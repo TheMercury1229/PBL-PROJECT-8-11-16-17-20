@@ -1,4 +1,4 @@
-import { Request, RequestHandler, Response } from "express";
+import type { Request, RequestHandler, Response } from "express";
 
 export const create: RequestHandler = async (req: Request, res: Response) => {
   res.json({

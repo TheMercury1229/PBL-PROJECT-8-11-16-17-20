@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response, RequestHandler } from "express";
+import type { NextFunction, Request, Response, RequestHandler } from "express";
 import bcrypt from "bcryptjs";
 import db from "../config/db";
 import { createTokenAndSetCookie } from "../lib/createTokenAndSetCookie";
@@ -130,7 +130,7 @@ export const login: RequestHandler = async (
       return;
     }
     // Create a JWT token
-   await createTokenAndSetCookie(findUserInDb.id, res);
+    await createTokenAndSetCookie(findUserInDb.id, res);
     res.status(200).json({
       success: true,
       message: "User logged in successfully",
@@ -230,7 +230,7 @@ export const onboard: RequestHandler = async (
 
         let jobSeekerId: string;
         const genderUser =
-          gender == "MALE"
+          gender === "MALE"
             ? UserGender.MALE
             : gender === "FEMALE"
             ? UserGender.FEMALE

@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import type { Request, Response, NextFunction } from "express";
 import express from "express";
 import cookieParser from "cookie-parser";
 import authRouter from "./routes/auth.route";
@@ -19,6 +19,7 @@ app.use("/api/v1/users", userRouter);
 
 app.use(((err: Error, req: Request, res: Response, next: NextFunction) => {
   // error handling code here
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   const statusCode = (err as any).statusCode || 500;
   const message = err.message || "Internal Server Error";
   return res.status(statusCode).json({
