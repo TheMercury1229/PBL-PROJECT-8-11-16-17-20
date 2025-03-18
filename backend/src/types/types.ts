@@ -6,3 +6,7 @@ export type MLJobType = {
 export type MLSkillsType = {
     name : string
 }
+
+export type RecruiterJob = {
+    
+}

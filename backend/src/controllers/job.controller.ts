@@ -14,6 +14,7 @@ export const create: RequestHandler = async (req: Request, res: Response) => {
     if (!userId) {
       res.status(404).json({ data: null, message: "UNAUTHORIZED USER" });
     }
+
     const jobRecruiter = db.jobRecruiter.findUnique({
       where: {
         id: userId as string,
