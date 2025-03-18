@@ -92,7 +92,6 @@ export const getJobTitlesAndSkills: RequestHandler = async (req: Request, res: R
     let output: Output[] = [];
     const jobs = await db.mLJob.findMany();
     for (var i = 0; i < jobs.length; i++) {
-    for (var i = 0; i < jobs.length; i++) {
       const skills = await db.mLSkill.findMany({
         where: {
           mlJobId: jobs[i].id
