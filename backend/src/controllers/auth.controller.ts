@@ -72,6 +72,7 @@ export const register: RequestHandler = async (
           role === "JOB_SEEKER" ? UserRole.JOB_SEEKER : UserRole.JOB_RECRUITER,
       },
     });
+    await createTokenAndSetCookie(user.id,res);
     res.status(201).json({
       success: true,
       message: "User created successfully",

@@ -26,7 +26,7 @@ model JobSeeker {
   userId        String         @unique
   profile       UserProfile?
   preferredJobs PreferredJob[]
-  appliedJobs   RecruiterJob[] // Corrected relation
+  appliedJobs   RecruiterJob[]
 }
 
 model UserProfile {
@@ -66,7 +66,7 @@ model MLJob {
   id             String         @id @default(cuid())
   title          String
   description    String?
-  salary         Int
+  salary         String
   employmentType EmploymentType
   skills         MLSkill[] // Static list of skills required for this job
   preferredJobs  PreferredJob[]
@@ -76,6 +76,12 @@ model MLJob {
 model RecruiterJob {
   id             String       @id @default(cuid())
   jobRecruiterId String
+  latitude       Float
+  longitude      Float
+  location       String       //name of city or something like that
+  preferance     Preferance
+  qualifications  String
+  experience      String
   jobRecruiter   JobRecruiter @relation(fields: [jobRecruiterId], references: [id])
   mlJobId        String
   mlJob          MLJob        @relation(fields: [mlJobId], references: [id])
@@ -99,7 +105,10 @@ enum UserGender {
   FEMALE
   OTHER
 }
-
+enum Preferance {
+  Male
+  Female
+}
 enum EmploymentType {
   FULL_TIME
   PART_TIME
