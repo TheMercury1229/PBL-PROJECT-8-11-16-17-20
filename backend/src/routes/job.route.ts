@@ -5,7 +5,7 @@ import { authMiddleware } from "../lib/authMiddleware";
 
 
 const jobRouter = Router();
-jobRouter.get("/postJob", create);
+jobRouter.post("/postJob", authMiddleware ,create);
 jobRouter.get("/read", read);
 
 //in the middleware the req.headers['userId'] = userId
