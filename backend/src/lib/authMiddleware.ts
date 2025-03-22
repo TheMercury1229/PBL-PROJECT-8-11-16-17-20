@@ -6,10 +6,12 @@ export const authMiddleware  =   (req:Request, res: Response , next : NextFuncti
   try {
     const token = req.cookies?.jwt;
     if (!token) {
-        res.status(401).json({ data: null, message: "UNAUTHORIZED USER: No Token Found" });
+      console.log("no coookie");
+      res.status(401).json({ data: null, message: "UNAUTHORIZED USER: No Token Found" });
+      return;
     }
-    const decoded = jwt.verify(token, envObj.JWT_SECRET!);
-    req.headers['userId'] = decoded as string;
+    const decoded  = jwt.verify(token, envObj.JWT_SECRET!) as { id: string }
+    req.headers['userId'] = decoded.id;
     next();
   } catch (error) {
     res.status(404).json({data : null, message : "UNAUTHORIZED USER"})
