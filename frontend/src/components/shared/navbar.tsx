@@ -17,11 +17,13 @@ const Navbar: React.FC = () => {
       </div>
 
       {/* Auth Buttons */}
-      <div className="flex space-x-4">
-        <button className="text-white hover:text-gray-300 transition">Login</button>
-        <button className="bg-white text-[#0039a6] px-4 py-2 rounded-md hover:bg-gray-200 transition">
+      <div className="flex space-x-4 items-center">
+        <Link to="/login" className="text-white hover:text-gray-300 transition">
+          Login
+        </Link>
+        <Link to='/Signup' className="bg-white text-[#0039a6] px-4 py-2 rounded-md hover:bg-gray-200 transition">
           Signup
-        </button>
+        </Link>
       </div>
     </nav>
   );

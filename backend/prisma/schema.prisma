@@ -53,6 +53,7 @@ model MLSkill {
   mlJobId          String
   mlJob            MLJob              @relation(fields: [mlJobId], references: [id])
   UserSkillMapping UserSkillMapping[]
+  RecruiterSkills  RecruiterSkills[]
 }
 
 model UserSkillMapping {
@@ -89,6 +90,15 @@ model RecruiterJob {
   mlJobId        String
   mlJob          MLJob        @relation(fields: [mlJobId], references: [id])
   appliedUsers   JobSeeker[]
+  skills         RecruiterSkills[]
+}
+
+model RecruiterSkills{
+  id             String       @id @default(cuid())
+  skillId        String
+  skill          MLSkill      @relation(fields: [skillId], references: [id]) // One-to-One
+  recruiterJobId String
+  recruiterJob   RecruiterJob @relation(fields: [recruiterJobId], references: [id])
 }
 
 model JobRecruiter {

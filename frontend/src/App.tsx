@@ -24,19 +24,38 @@ const appRouter = createBrowserRouter([
   },
 ])
 
+// function App() {
+//   return (
+//    <div>
+//     <Router>
+//       <Route></Route>
+//     </Router>
+//     {/* <Signup/> */}
+//     {/* <Login/> */}
+//     <Home/>
+//     {/* <RecJobs/> */}
+//     {/* <Jobs/> */}
+//     {/* <Browse/> */}
+//     {/* <Profile/> */}
+//     {/* <Jobdesc/> */}
+//     {/* <RouterProvider router ={appRouter}/> */}
+//    </div>
+//   );
+// }
 function App() {
   return (
-   <div>
-    {/* <Signup/> */}
-    {/* <Login/> */}
-    <Home/>
-    {/* <RecJobs/> */}
-    {/* <Jobs/> */}
-    {/* <Browse/> */}
-    {/* <Profile/> */}
-    {/* <Jobdesc/> */}
-    {/* <RouterProvider router ={appRouter}/> */}
-   </div>
+    
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/recruiter-jobs" element={<RecJobs />} />
+        <Route path="/jobs" element={<Jobs />} />
+        <Route path="/browse" element={<Browse />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/jobdesc" element={<Jobdesc />} />
+      </Routes>
+    
   );
 }
 export default App;
