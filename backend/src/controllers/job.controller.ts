@@ -18,7 +18,7 @@ export const create: RequestHandler = async (req: Request, res: Response) => {
 
     const user = await db.user.findUnique({
       where: {
-        userId: userId as string,
+        id: userId as string,
       },
     });
 
