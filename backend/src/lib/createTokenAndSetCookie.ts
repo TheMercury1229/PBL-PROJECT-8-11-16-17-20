@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import envObj from "../config/config";
 
 export const createTokenAndSetCookie = async (id: string, res: Response) => {
-  const token = await jwt.sign({ id: id }, envObj.JWT_SECRET!, {
+  const token = await jwt.sign({id}, envObj.JWT_SECRET!, {
     expiresIn: "30d",
   });
   res.cookie("jwt", token, {

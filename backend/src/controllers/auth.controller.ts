@@ -181,7 +181,8 @@ export const onboard: RequestHandler = async (
       return;
     }
 
-    if (role === "JOB_RECRUITER") {
+    if (role === "JOB_RECRUITER") 
+    {
       await db.$transaction(async (tx) => {
         await tx.user.update({
           where: { id: userId },

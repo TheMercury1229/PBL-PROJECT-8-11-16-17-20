@@ -27,13 +27,14 @@ model JobSeeker {
   profile       UserProfile?
   preferredJobs PreferredJob[]
   appliedJobs   RecruiterJob[]
+  skills        UserSkillMapping[]
 }
 
 model UserProfile {
   id          String    @id @default(cuid())
   jobSeekerId String    @unique
   jobSeeker   JobSeeker @relation(fields: [jobSeekerId], references: [id])
-  education   String
+  education   String    //qualifications
   experience  String
 }
 
@@ -52,6 +53,7 @@ model MLSkill {
   mlJobId          String
   mlJob            MLJob              @relation(fields: [mlJobId], references: [id])
   UserSkillMapping UserSkillMapping[]
+  RecruiterSkills  RecruiterSkills[]
 }
 
 model UserSkillMapping {
@@ -60,6 +62,8 @@ model UserSkillMapping {
   skill          MLSkill      @relation(fields: [skillId], references: [id]) // One-to-One
   preferredJobId String
   preferredJob   PreferredJob @relation(fields: [preferredJobId], references: [id])
+  jobSeekerId String
+  jobSeeker   JobSeeker          @relation(fields: [jobSeekerId], references: [id])
 }
 
 model MLJob {
@@ -86,6 +90,15 @@ model RecruiterJob {
   mlJobId        String
   mlJob          MLJob        @relation(fields: [mlJobId], references: [id])
   appliedUsers   JobSeeker[]
+  skills         RecruiterSkills[]
+}
+
+model RecruiterSkills{
+  id             String       @id @default(cuid())
+  skillId        String
+  skill          MLSkill      @relation(fields: [skillId], references: [id]) // One-to-One
+  recruiterJobId String
+  recruiterJob   RecruiterJob @relation(fields: [recruiterJobId], references: [id])
 }
 
 model JobRecruiter {
