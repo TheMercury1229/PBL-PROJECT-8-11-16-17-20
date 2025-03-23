@@ -20,7 +20,6 @@ model User {
 
 model JobSeeker {
   id            String             @id @default(cuid())
-  id            String             @id @default(cuid())
   age           Int
   gender        UserGender
   userId        String             @unique
@@ -80,7 +79,6 @@ model MLJob {
 
 model RecruiterJob {
   id             String            @id @default(cuid())
-  id             String            @id @default(cuid())
   jobRecruiterId String
   mlJobId        String
   latitude       Float
@@ -96,7 +94,6 @@ model RecruiterJob {
 }
 
 model RecruiterSkills {
-  model RecruiterSkills {
   id             String       @id @default(cuid())
   skillId        String
   recruiterJobId String
