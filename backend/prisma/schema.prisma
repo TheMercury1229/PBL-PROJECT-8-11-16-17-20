@@ -78,7 +78,7 @@ model MLJob {
 }
 
 model RecruiterJob {
-  id             String            @id @default(cuid())
+  id             String           @id @default(cuid())
   jobRecruiterId String
   mlJobId        String
   latitude       Float
@@ -87,10 +87,11 @@ model RecruiterJob {
   preferance     Preferance
   experience     String
   qualifications String
-  jobRecruiter   JobRecruiter      @relation(fields: [jobRecruiterId], references: [id])
-  mlJob          MLJob             @relation(fields: [mlJobId], references: [id])
+  jobRecruiter   JobRecruiter     @relation(fields: [jobRecruiterId], references: [id])
+  mlJob          MLJob            @relation(fields: [mlJobId], references: [id])
   skills         RecruiterSkills[]
-  appliedUsers   JobSeeker[]       @relation("JobSeekerToRecruiterJob")
+  appliedUsers   JobSeeker[]      @relation("JobSeekerToRecruiterJob")
+  ml             ML?              
 }
 
 model RecruiterSkills {
@@ -106,6 +107,13 @@ model JobRecruiter {
   userId        String         @unique
   user          User           @relation(fields: [userId], references: [id])
   recruiterJobs RecruiterJob[]
+}
+
+model ML {
+  id               String       @id @default(cuid())
+  recruiterJobId   String       @unique  // Unique ensures one-to-one
+  combined         String
+  recruiterJob     RecruiterJob @relation(fields: [recruiterJobId], references: [id]) // Holds FK
 }
 
 enum UserRole {
