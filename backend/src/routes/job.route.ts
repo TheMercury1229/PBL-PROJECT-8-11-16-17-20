@@ -4,7 +4,7 @@ import {
   getJobTitlesAndSkills,
   read,
 } from "../controllers/job.controller";
-import { addData, addSkills } from "../controllers/addData";
+// import { addData, addSkills } from "../controllers/addData";
 import { authMiddleware } from "../lib/authMiddleware";
 
 const jobRouter = Router();

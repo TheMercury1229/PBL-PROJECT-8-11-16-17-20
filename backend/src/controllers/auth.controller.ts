@@ -72,7 +72,7 @@ export const register: RequestHandler = async (
           role === "JOB_SEEKER" ? UserRole.JOB_SEEKER : UserRole.JOB_RECRUITER,
       },
     });
-    await createTokenAndSetCookie(user.id,res);
+    await createTokenAndSetCookie(user.id, res);
     res.status(201).json({
       success: true,
       message: "User created successfully",
@@ -290,5 +290,41 @@ export const onboard: RequestHandler = async (
   } catch (error) {
     console.error("Error in onboard controller:", error);
     next(error);
+  }
+};
+
+// /api/auth/onboard-extend -> POST
+export const onboardExtend: RequestHandler = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const userId = req.headers["userId"];
+    if (!userId) {
+      res.status(400).json({
+        data: null,
+        message: "User ID is required",
+      });
+    }
+    const jobSeeker = db.jobSeeker.findUnique({
+      where: {
+        userId: userId as string,
+      },
+    });
+    if (!jobSeeker) {
+      res.status(400).json({
+        data: null,
+        message: "User is not a job seeker",
+      });
+    }
+    const { skills, jobsPreffered } = req.body;
+    if (!skills || !jobsPreffered) {
+      res.status(400).json({
+        data: null,
+        message: "Skills and Jobs preferred are required",
+      });
+    }
+  } catch (error) {
+    res.status(400).json({ data: false, message: "INTERNAL_SERVER_ERROR" });
   }
 };
