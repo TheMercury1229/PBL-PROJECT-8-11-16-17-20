@@ -2,7 +2,6 @@ import { Request, RequestHandler, Response } from "express";
 import db from "../config/db";
 // import { MLJobType , MLSkillType } from "@prisma/client";
 import { MLJobType, MLSkillsType } from "../types/types";
-import { describe } from "node:test";
 
 type Output = {
   job: MLJobType;
@@ -38,18 +37,28 @@ export const read: RequestHandler = async (req: Request, res: Response) => {
       res.status(404).json({ data: null, message: "UNAUTHORIZED USER" });
     }
     // Find the job recruiter
-    const jobRecruiter = db.jobRecruiter.findUnique({
+    const jobRecruiterUser = db.jobRecruiter.findUnique({
       where: {
-        id: userId as string,
+        userId: userId as string,
       },
     });
     //
-    if (!jobRecruiter) {
+    if (!jobRecruiterUser) {
       res
         .status(404)
         .json({ data: null, message: "you are not job recruiter" });
     }
-  } catch (error) {}
+    console.log(jobRecruiterUser);
+    const findJobs = await db.jobRecruiter.findMany({
+      select: {
+        recruiterJobs: true,
+      },
+    });
+    console.log(findJobs);
+    res.json({ data: findJobs, message: "Jobs fetched" });
+  } catch (error) {
+    res.status(404).json({ data: false, message: "INTERNAL_SERVER_ERROR" });
+  }
 };
 
 export const getJobTitlesAndSkills: RequestHandler = async (
