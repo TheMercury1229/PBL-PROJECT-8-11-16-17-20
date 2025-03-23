@@ -7,7 +7,7 @@ import { Preferance } from "@prisma/client";
 
 type Output = {
   job: MLJobType,
-  skills: MLSkillsType[]
+  skills: string
 }
 export const create: RequestHandler = async (req: Request, res: Response) => {
   try {
@@ -131,11 +131,11 @@ export const getJobTitlesAndSkills: RequestHandler = async (req: Request, res: R
         }
       });
       const job = { title: jobs[i].title, description: jobs[i].description as string };
-      const skillsArray = skills.map((value, index) => {
-        return { name: value.name }
-      });
-      output.push({ job, skills: skillsArray });
-      output.push({ job, skills: skillsArray });
+      let skillString = "";
+      for(var j = 0 ; j<skills.length;j++){
+        skillString += skills[j].name + " ";  
+      }
+      output.push({ job, skills: skillString });
     }
     res.json({ data: output });
   } catch (error) {

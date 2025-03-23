@@ -14,36 +14,36 @@ model User {
   mobile       String        @unique
   password     String
   role         UserRole
-  jobSeeker    JobSeeker?
   jobRecruiter JobRecruiter?
+  jobSeeker    JobSeeker?
 }
 
 model JobSeeker {
-  id            String         @id @default(cuid())
+  id            String             @id @default(cuid())
   age           Int
   gender        UserGender
-  user          User           @relation(fields: [userId], references: [id])
-  userId        String         @unique
-  profile       UserProfile?
+  userId        String             @unique
+  user          User               @relation(fields: [userId], references: [id])
   preferredJobs PreferredJob[]
-  appliedJobs   RecruiterJob[]
+  profile       UserProfile?
   skills        UserSkillMapping[]
+  appliedJobs   RecruiterJob[]     @relation("JobSeekerToRecruiterJob")
 }
 
 model UserProfile {
   id          String    @id @default(cuid())
   jobSeekerId String    @unique
-  jobSeeker   JobSeeker @relation(fields: [jobSeekerId], references: [id])
-  education   String    //qualifications
+  education   String
   experience  String
+  jobSeeker   JobSeeker @relation(fields: [jobSeekerId], references: [id])
 }
 
 model PreferredJob {
   id          String             @id @default(cuid())
   mlJobId     String
-  mlJob       MLJob              @relation(fields: [mlJobId], references: [id])
   jobSeekerId String
   jobSeeker   JobSeeker          @relation(fields: [jobSeekerId], references: [id])
+  mlJob       MLJob              @relation(fields: [mlJobId], references: [id])
   skills      UserSkillMapping[]
 }
 
@@ -52,18 +52,18 @@ model MLSkill {
   name             String
   mlJobId          String
   mlJob            MLJob              @relation(fields: [mlJobId], references: [id])
-  UserSkillMapping UserSkillMapping[]
   RecruiterSkills  RecruiterSkills[]
+  UserSkillMapping UserSkillMapping[]
 }
 
 model UserSkillMapping {
   id             String       @id @default(cuid())
   skillId        String
-  skill          MLSkill      @relation(fields: [skillId], references: [id]) // One-to-One
   preferredJobId String
+  jobSeekerId    String
+  jobSeeker      JobSeeker    @relation(fields: [jobSeekerId], references: [id])
   preferredJob   PreferredJob @relation(fields: [preferredJobId], references: [id])
-  jobSeekerId String
-  jobSeeker   JobSeeker          @relation(fields: [jobSeekerId], references: [id])
+  skill          MLSkill      @relation(fields: [skillId], references: [id])
 }
 
 model MLJob {
@@ -72,33 +72,33 @@ model MLJob {
   description    String?
   salary         String
   employmentType EmploymentType
-  skills         MLSkill[] // Static list of skills required for this job
+  skills         MLSkill[]
   preferredJobs  PreferredJob[]
   recruiterJobs  RecruiterJob[]
 }
 
 model RecruiterJob {
-  id             String       @id @default(cuid())
+  id             String            @id @default(cuid())
   jobRecruiterId String
-  latitude       Float
-  longitude      Float
-  location       String       //name of city or something like that
-  preferance     Preferance
-  qualifications  String
-  experience      String
-  jobRecruiter   JobRecruiter @relation(fields: [jobRecruiterId], references: [id])
   mlJobId        String
-  mlJob          MLJob        @relation(fields: [mlJobId], references: [id])
-  appliedUsers   JobSeeker[]
+  latitude       Float
+  location       String
+  longitude      Float
+  preferance     Preferance
+  experience     String
+  qualifications String
+  jobRecruiter   JobRecruiter      @relation(fields: [jobRecruiterId], references: [id])
+  mlJob          MLJob             @relation(fields: [mlJobId], references: [id])
   skills         RecruiterSkills[]
+  appliedUsers   JobSeeker[]       @relation("JobSeekerToRecruiterJob")
 }
 
-model RecruiterSkills{
+model RecruiterSkills {
   id             String       @id @default(cuid())
   skillId        String
-  skill          MLSkill      @relation(fields: [skillId], references: [id]) // One-to-One
   recruiterJobId String
   recruiterJob   RecruiterJob @relation(fields: [recruiterJobId], references: [id])
+  skill          MLSkill      @relation(fields: [skillId], references: [id])
 }
 
 model JobRecruiter {
@@ -118,10 +118,12 @@ enum UserGender {
   FEMALE
   OTHER
 }
+
 enum Preferance {
   Male
   Female
 }
+
 enum EmploymentType {
   FULL_TIME
   PART_TIME

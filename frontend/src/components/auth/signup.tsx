@@ -4,8 +4,17 @@ import { Label } from "@radix-ui/react-label";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Link } from "react-router-dom";
-
+import axios from "axios";
+import { useUserStore } from "@/store/user";
 const Signup = () => {
+  const {
+    setId,
+    setFullName,
+    setEmail,
+    setMobile,
+    setRole,
+    setLoggedIn,
+  } = useUserStore();
   const [input, setInput] = React.useState({
     fullname: "",
     email: "",
@@ -24,25 +33,67 @@ const Signup = () => {
     preferredJob: "",
   });
 
-  const changeEventHandler = (e) => {
+  const changeEventHandler = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    console.log(e.target.name, e.target.value);
     setInput({ ...input, [e.target.name]: e.target.value });
   };
 
-  const additionalInfoHandler = (e) => {
+  const additionalInfoHandler = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    
+    if(e.target.name === "experience"){
+      let exp = parseInt(e.target.value) // Convert input to number
+      if (isNaN(exp) || exp < 1) {
+        exp = 1; // Ensure minimum valid value
+      } else if (exp > 15) {
+        exp = 10; // Adjust value if greater than 15
+      }
+      let value = "";
+      // Format experience range
+      if (exp <= 10) {
+        value = `1_to_${exp}`;
+      } else {
+        value = "11_to_15";
+      }
+      console.log(value);
+      setAdditionalInfo({ ...additionalInfo, [e.target.name]: value });
+      return;
+    }
+    console.log(e.target.name, e.target.value);
     setAdditionalInfo({ ...additionalInfo, [e.target.name]: e.target.value });
   };
 
-  const submitHandler = async (e) => {
+  const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log(input, additionalInfo);
-    // Here you can add your API call to submit the data
+    if(input.role === "JOB_RECRUITER"){
+      // API call to submit data goes here
+      try {
+        const response = await axios.post("http://localhost:5000/api/v1/auth/signup", {
+          email : input.email,
+          password : input.password,
+          role : input.role,
+          fullname : input.fullname,
+          mobile :  input.phoneNumber
+        }); 
+        console.log(response.data);
+        setId(response.data.data.id);
+        setEmail(response.data.data.email);
+        setRole(response.data.data.role);
+        setFullName(response.data.data.fullName);
+        setMobile(response.data.data.mobile);
+        setLoggedIn(true);
+      } catch (error) {
+        alert("SIGIN IN FAILED")
+      }
+    }
+    // API call to submit data goes here
   };
 
   return (
     <div>
       <Navbar />
       <div className="flex items-center justify-center max-w-7xl mx-auto">
-        <form onSubmit={(e) => e.preventDefault()} className="w-1/2 border border-gray-200 shadow-lg rounded-xl p-6 my-10 bg-white">
+        <form onSubmit={submitHandler} className="w-1/2 border border-gray-200 shadow-lg rounded-xl p-6 my-10 bg-white">
           <h1 className="flex items-center justify-center font-semibold text-2xl mb-6 text-gray-800">Create Your Account 🚀</h1>
 
           {step === 1 && (
@@ -70,22 +121,22 @@ const Signup = () => {
               <div className="mb-4">
                 <Label htmlFor="role" className="text-gray-700 font-medium">Role</Label>
                 <select name="role" value={input.role} onChange={changeEventHandler} className="w-full border rounded-md p-2">
-                  <option value="jobseeker">Job Seeker</option>
-                  <option value="recruiter">Recruiter</option>
+                  <option value="JOB_SEEKER">Job Seeker</option>
+                  <option value="JOB_RECRUITER">Recruiter</option>
                 </select>
               </div>
 
               <Button
-                onClick={() => {
+                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                   if (input.role === "recruiter") {
-                    submitHandler(); // Directly submit if recruiter
+                    submitHandler(e as unknown as React.FormEvent<HTMLFormElement>); // Type cast
                   } else {
-                    setStep(2); // Go to next step if job seeker
+                    setStep(2);
                   }
                 }}
                 className="w-full my-4 bg-[#0039a6] text-white font-medium py-2 rounded-md hover:bg-blue-700 transition-all"
               >
-                {input.role === "recruiter" ? "Sign Up" : "Next"}
+                {input.role === "JOB_RECRUITER" ? "Sign Up" : "Next"}
               </Button>
             </>
           )}
@@ -97,7 +148,6 @@ const Signup = () => {
                 <option value="10th">10th</option>
                 <option value="12th">12th</option>
                 <option value="graduate">Graduate</option>
-                <option value="other">Other</option>
               </select>
 
               <Label className="text-gray-700 font-medium">Experience (Years)</Label>
@@ -105,9 +155,8 @@ const Signup = () => {
 
               <Label className="text-gray-700 font-medium">Gender</Label>
               <select name="gender" onChange={additionalInfoHandler} className="w-full border rounded-md p-2 mb-3">
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
               </select>
 
               <Button onClick={() => setStep(3)} className="w-full bg-[#0039a6] text-white py-2 rounded-md hover:bg-blue-700">Next</Button>
@@ -132,7 +181,7 @@ const Signup = () => {
                 <option value="Pump Operator">Pump Operator</option>
               </select>
 
-              <Button onClick={submitHandler} className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700">Sign Up</Button>
+              <Button type="submit" className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700">Sign Up</Button>
             </>
           )}
         </form>
