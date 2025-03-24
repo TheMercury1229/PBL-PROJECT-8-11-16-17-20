@@ -95,7 +95,12 @@ export const create: RequestHandler = async (req: Request, res: Response) => {
         if (mlSkills.length !== skills.length) {
           throw new Error("SOME SKILLS ARE NOT AVAILABLE");
         }
+        let skillsString = "";
         for (var i = 0; i < mlSkills.length; i++) {
+          skillsString += mlSkills[i].name;
+          if(i !== mlSkills.length - 1){
+            skillsString += " ";
+          }
           await tx.recruiterSkills.create({
             data: {
               recruiterJobId: recruiterJob.id,
@@ -103,6 +108,13 @@ export const create: RequestHandler = async (req: Request, res: Response) => {
             },
           });
         }
+        let combined = skillsString + " " + experience + " " + location + " " +  preferance.toLowerCase() ;
+        await tx.mL.create({
+          data : {
+            combined : combined,
+            recruiterJobId : recruiterJob.id
+          }
+        });
       });
     } catch (error) {
       if (error instanceof Error) {

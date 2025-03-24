@@ -4,11 +4,20 @@ import cookieParser from "cookie-parser";
 import authRouter from "./routes/auth.route";
 import jobRouter from "./routes/job.route";
 import userRouter from "./routes/users.route";
+import cors from 'cors';
 const app = express();
 //Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Replace with your frontend URL
+    credentials: true, // Allow cookies/auth headers
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+  })
+);
 
 //Routes
 app.use("/api/v1/auth", authRouter);

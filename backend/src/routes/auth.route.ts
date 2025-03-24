@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   login,
   logout,
+  me,
   onboard,
   onboardExtend,
   register,
@@ -15,5 +16,6 @@ authRouter.post("/login", login);
 authRouter.post("/onboard", onboard);
 authRouter.post("/logout", logout);
 authRouter.post("/onboard-extend", authMiddleware, onboardExtend);
+authRouter.get("/me", authMiddleware, me);
 
 export default authRouter;

@@ -3,7 +3,9 @@ import bcrypt from "bcryptjs";
 import db from "../config/db";
 import { createTokenAndSetCookie } from "../lib/createTokenAndSetCookie";
 import { UserGender, UserRole } from "@prisma/client";
-
+import envObj from "../config/config";
+import jwt from "jsonwebtoken";
+import { getUserById } from "../lib/getUserById";
 // /api/auth/register -> POST
 export const register: RequestHandler = async (
   req: Request,
@@ -11,6 +13,7 @@ export const register: RequestHandler = async (
   next: NextFunction
 ) => {
   try {
+    console.log("reached here");
     const { email, password, fullName, mobile, role } = await req.body;
     // Check if all the fields are provided
     if (!email || !password || !fullName || !mobile || !role) {
@@ -326,5 +329,29 @@ export const onboardExtend: RequestHandler = async (
     }
   } catch (error) {
     res.status(400).json({ data: false, message: "INTERNAL_SERVER_ERROR" });
+  }
+};
+
+export const me : RequestHandler = async (req: Request, res: Response) => {
+  try {
+    const userId = req.headers["userId"];
+    const user = await getUserById(userId as string);
+    if (!user) {
+      res.status(400).json({ data: null, message: "USER_NOT_FOUND" });
+      return;
+    }
+    console.log(user)
+    res.status(200).json({
+      data: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        fullName: user.fullName,
+        mobile: user.mobile,
+      },
+      message: "USER_FOUND",
+    });
+  } catch (error) {
+    res.status(404).json({data : null, message : "UNAUTHORIZED USER"})
   }
 };

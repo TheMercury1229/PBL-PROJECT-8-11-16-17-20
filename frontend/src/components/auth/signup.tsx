@@ -3,10 +3,14 @@ import Navbar from "../shared/navbar";
 import { Label } from "@radix-ui/react-label";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { Link } from "react-router-dom";
 import axios from "axios";
 import { useUserStore } from "@/store/user";
+import { data } from "../../store/jobsAndSkills"
+import { TitleAndSkills } from "@/types/types";
+import { useNavigate } from "react-router-dom";
+//age is hardcoded to 25
 const Signup = () => {
+  const navigate = useNavigate();
   const {
     setId,
     setFullName,
@@ -20,17 +24,18 @@ const Signup = () => {
     email: "",
     phoneNumber: "",
     password: "",
-    role: "jobseeker",
+    role: "JOB_SEEKER",
   });
 
+  const [jobTitles, setJobTitles] = React.useState<string[]>([]);
+  const [jobTitlesAndSkills,  setJobTitlesAndSkills] = React.useState<TitleAndSkills[]>([]);
   const [step, setStep] = React.useState(1);
   const [additionalInfo, setAdditionalInfo] = React.useState({
-    qualification: "",
-    experience: "",
-    gender: "",
-    location: "",
-    skills: "",
-    preferredJob: "",
+    qualification: "10th",
+    experience: "1_to_2",
+    gender: "MALE",
+    location: "mumbai",
+    
   });
 
   const changeEventHandler = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -39,8 +44,8 @@ const Signup = () => {
   };
 
   const additionalInfoHandler = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    
-    if(e.target.name === "experience"){
+
+    if (e.target.name === "experience") {
       let exp = parseInt(e.target.value) // Convert input to number
       if (isNaN(exp) || exp < 1) {
         exp = 1; // Ensure minimum valid value
@@ -65,16 +70,18 @@ const Signup = () => {
   const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log(input, additionalInfo);
-    if(input.role === "JOB_RECRUITER"){
+    if (input.role === "JOB_RECRUITER") {
       // API call to submit data goes here
       try {
-        const response = await axios.post("http://localhost:5000/api/v1/auth/signup", {
-          email : input.email,
-          password : input.password,
-          role : input.role,
-          fullname : input.fullname,
-          mobile :  input.phoneNumber
-        }); 
+        const response = await axios.post("http://localhost:3000/api/v1/auth/register", {
+          email: input.email,
+          password: input.password,
+          role: input.role,
+          fullName: input.fullname,
+          mobile: input.phoneNumber,
+        } , {
+          withCredentials : true
+        });
         console.log(response.data);
         setId(response.data.data.id);
         setEmail(response.data.data.email);
@@ -82,13 +89,90 @@ const Signup = () => {
         setFullName(response.data.data.fullName);
         setMobile(response.data.data.mobile);
         setLoggedIn(true);
+        alert("SIGNUP SUCCESSFULL")
+        navigate("/")
       } catch (error) {
         alert("SIGIN IN FAILED")
       }
     }
-    // API call to submit data goes here
+    else {
+      try {
+        const response = await axios.post("http://localhost:3000/api/v1/auth/register", {
+          email: input.email,
+          password: input.password,
+          role: input.role,
+          fullName: input.fullname,
+          mobile: input.phoneNumber,
+        } , {
+          withCredentials : true
+        });
+        console.log(response.data);
+        setId(response.data.data.id);
+        setEmail(response.data.data.email);
+        setRole(response.data.data.role);
+        setFullName(response.data.data.fullName);
+        setMobile(response.data.data.mobile);
+        setLoggedIn(true);
+        const response2 = await axios.post("http://localhost:3000/api/v1/auth/onboard", {
+          userId : response.data.data.id, 
+          role : response.data.data.role, 
+          age : 25, 
+          gender : additionalInfo.gender, 
+          education : additionalInfo.qualification, 
+          experience : additionalInfo.experience 
+        } , {
+          withCredentials : true
+        });
+        console.log(response2);
+        const response3 = await axios.post("http://localhost:3000/api/v1/users/set-preferred-job", {
+          titleAndSkills : jobTitlesAndSkills
+        } , {
+          withCredentials : true
+        });
+        console.log(response3);
+        alert("SIGNUP SUCCESSFULL")
+        navigate("/")
+        
+      } catch (error) {
+        alert("SIGIN IN FAILED")
+        console.log(error)
+      }
+    }
   };
 
+  const handleSelectedJobs = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, checked } = event.target;
+    setJobTitles((prevSelectedJobs) =>
+      checked ? [...prevSelectedJobs, value] : prevSelectedJobs.filter((job) => job !== value)
+    );
+  };
+
+  const handleSkills = (jobTitle: string, checked: boolean, skill: string) => { 
+    setJobTitlesAndSkills((prevJobTitlesAndSkills) => {
+      let updatedList = [...prevJobTitlesAndSkills];
+      // Find index of the job title in the existing list
+      const jobIndex = updatedList.findIndex((item) => item.title === jobTitle);
+      if (jobIndex === -1) {
+        // If job title does not exist, add a new entry
+        updatedList.push({ title: jobTitle, skills: checked ? [skill] : [] });
+      } else {
+        // If job title exists, update the skills array
+        if (checked) {
+          // Add skill if it's not already present
+          if (!updatedList[jobIndex].skills.includes(skill)) {
+            updatedList[jobIndex].skills.push(skill);
+          }
+        } else {
+          // Remove skill if it exists
+          updatedList[jobIndex].skills = updatedList[jobIndex].skills.filter((s) => s !== skill);
+        }
+      }
+  
+      return updatedList;
+    });
+    console.log(jobTitlesAndSkills)
+  };
+  
   return (
     <div>
       <Navbar />
@@ -128,7 +212,7 @@ const Signup = () => {
 
               <Button
                 onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                  if (input.role === "recruiter") {
+                  if (input.role === "JOB_RECRUITER") {
                     submitHandler(e as unknown as React.FormEvent<HTMLFormElement>); // Type cast
                   } else {
                     setStep(2);
@@ -155,9 +239,11 @@ const Signup = () => {
 
               <Label className="text-gray-700 font-medium">Gender</Label>
               <select name="gender" onChange={additionalInfoHandler} className="w-full border rounded-md p-2 mb-3">
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
+                <option value="MALE">Male</option>
+                <option value="FEMALE">Female</option>
               </select>
+              <Label className="text-gray-700 font-medium">Location</Label>
+              <Input type="text" name="location" onChange={additionalInfoHandler} className="w-full border rounded-md p-2 mb-3" placeholder="Enter your city" />
 
               <Button onClick={() => setStep(3)} className="w-full bg-[#0039a6] text-white py-2 rounded-md hover:bg-blue-700">Next</Button>
             </>
@@ -165,25 +251,54 @@ const Signup = () => {
 
           {step === 3 && (
             <>
-              <Label className="text-gray-700 font-medium">Skills</Label>
-              <select name="skills" onChange={additionalInfoHandler} className="w-full border rounded-md p-2 mb-3">
-                <option value="Troubleshooting">Troubleshooting</option>
-                <option value="Attention to Detail">Attention to Detail</option>
-                <option value="Time Management">Time Management</option>
-                <option value="Cleaning">Cleaning</option>
-                <option value="Safety Practices">Safety Practices</option>
-              </select>
-
-              <Label className="text-gray-700 font-medium">Preferred Job</Label>
-              <select name="preferredJob" onChange={additionalInfoHandler} className="w-full border rounded-md p-2 mb-3">
-                <option value="Electrician">Electrician</option>
-                <option value="Maid">Maid</option>
-                <option value="Pump Operator">Pump Operator</option>
-              </select>
-
-              <Button type="submit" className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700">Sign Up</Button>
+              <Label className="text-gray-700 font-medium">JOB TITLES</Label>
+              {data.map((job) => (
+                <label key={job.job.title} className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    value={job.job.title}
+                    onChange={handleSelectedJobs}
+                    checked={jobTitles.includes(job.job.title)}
+                    className="form-checkbox"
+                  />
+                  <span>{job.job.title}</span>
+                </label>
+              ))}
+              <Button onClick={() => setStep(4)} className="w-full bg-[#0039a6] text-white py-2 rounded-md hover:bg-blue-700">Next</Button>
+              {/* <Button type="submit" className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700">Sign Up</Button> */}
             </>
           )}
+          {step === 4 && (
+            <>
+              <Label className="text-gray-700 font-medium">SKILLS</Label>
+              {jobTitles.map((jobTitle) =>
+                data.map((job) => {
+                  if (job.job.title === jobTitle) return (
+                    <div key={job.job.title}>
+                      <label className="flex items-center space-x-2">{job.job.title}</label>
+                      {job.skills.split(" ").map((skill, index) => (
+                        <label key={index} className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            value={skill}
+                            onChange={(e) => handleSkills(job.job.title, e.target.checked, skill)}
+                            className="form-checkbox"
+                          />
+                          <span>{skill}</span>
+                        </label>
+                      ))}
+                    </div>
+                  );
+                  return null; // Ensure .map() always returns something
+                })
+              )}
+              <br />
+              <Button onClick={() => setStep(4)} className="w-full bg-[#0039a6] text-white py-2 rounded-md hover:bg-blue-700">
+                Signup
+              </Button>
+            </>
+          )}
+
         </form>
       </div>
     </div>

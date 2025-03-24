@@ -7,10 +7,14 @@ import Browse from "./components/browse";
 import Profile from "./components/ui/profile";
 import Jobdesc from "./components/ui/jobdesc";
 import RecJobs from "./components/ui/RecJobs";
+import InitUser from "./components/auth/InitUser";
 
 function App() {
   return (
-    <Routes>
+    <>
+      <InitUser></InitUser>
+      <Routes>
+      
       <Route path="/" element={<Home />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/login" element={<Login />} />
@@ -20,6 +24,7 @@ function App() {
       <Route path="/profile" element={<Profile />} />
       <Route path="/jobdesc" element={<Jobdesc />} />
     </Routes>
+    </>
   );
 }
 export default App;

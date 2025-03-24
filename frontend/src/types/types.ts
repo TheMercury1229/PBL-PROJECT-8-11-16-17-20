@@ -14,3 +14,8 @@ export interface UserState {
     setRole: (role: string) => void;
     setLoggedIn: (status: boolean) => void;
 }
+
+export type TitleAndSkills = {
+    title: string; // Job title from mlJob
+    skills: string[]; // Selected skills from MLSKILLS
+  };

@@ -4,21 +4,45 @@ import { Label } from "@radix-ui/react-label";
 import { Input } from "../ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "../ui/button";
-import { Link } from "react-router-dom";
-
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useUserStore } from "@/store/user";
 const Login = () => {
+  const navigate = useNavigate();
   const [input, setInput] = React.useState({
     email: "",
     password: "",
-    role: "jobseeker",
+    role: "JOB_SEEKER",
   });
-
-  const changeEventHandler = (e) => {
+const {
+    setId,
+    setFullName,
+    setEmail,
+    setMobile,
+    setRole,
+    setLoggedIn,
+  } = useUserStore();
+  const changeEventHandler = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setInput({ ...input, [e.target.name]: e.target.value });
   };
 
-  const submitHandler = async (e) => {
+  const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    try {
+      const response = await axios.post("http://localhost:3000/api/auth/login", input , {
+        withCredentials : true
+      });
+      setId(response.data.data.id);
+      setEmail(response.data.data.email);
+      setRole(response.data.data.role);
+      setFullName(response.data.data.fullName);
+      setMobile(response.data.data.mobile);
+      setLoggedIn(true);
+      alert("LOGIN SUCCESSFUL")
+      navigate("/")
+    } catch (error) {
+      alert("LOGIN FAILED")
+    }
     // console.log(input);
   };
 

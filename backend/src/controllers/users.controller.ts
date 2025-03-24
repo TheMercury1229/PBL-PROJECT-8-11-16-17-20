@@ -55,8 +55,11 @@ export const setPreferredJob: RequestHandler = async (
             name: {
               in: skills,
             },
-          },
+            mlJobId: mlJob.id,
+          }
         });
+        console.log("ml Skills");
+        console.log(mlSkills);
         if (mlSkills.length !== skills.length) {
           res.status(400).json({ data: false, message: "ML_SKILLS_NOT_FOUND" });
           return;
@@ -80,9 +83,11 @@ export const setPreferredJob: RequestHandler = async (
     });
     res
       .status(200)
-      .json({ data: true, message: "PREFERRED_JOB_SET_SUCCESSFULLY" });
+      .json({ data: true, titleAndSkills, message: "PREFERRED_JOB_SET_SUCCESSFULLY" });
+      return;
   } catch (error) {
     console.log(error);
     res.status(500).json({ data: false, message: "INTERNAL_SERVER_ERROR" });
+    return;
   }
 };
