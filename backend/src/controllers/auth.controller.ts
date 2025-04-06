@@ -65,16 +65,39 @@ export const register: RequestHandler = async (
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 12);
     // Create the user in the db
-    const user = await db.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        fullName,
-        mobile,
-        role:
-          role === "JOB_SEEKER" ? UserRole.JOB_SEEKER : UserRole.JOB_RECRUITER,
-      },
-    });
+    // const user = await db.user.create({
+    //   data: {
+    //     email,
+    //     password: hashedPassword,
+    //     fullName,
+    //     mobile,
+    //     role:
+    //       role === "JOB_SEEKER" ? UserRole.JOB_SEEKER : UserRole.JOB_RECRUITER,
+    //   },
+    // });
+    
+    const user = await db.$transaction(async (tx)=>{
+      const user = await tx.user.create({
+        data : {
+          email , 
+          password : hashedPassword,
+          fullName,
+          mobile,
+          role : role === "JOB_SEEKER" ? UserRole.JOB_SEEKER : UserRole.JOB_RECRUITER
+        }
+      })
+      if(role == "JOB_RECRUITER"){
+        await tx.jobRecruiter.create({
+          data : {
+            userId : user.id
+          }
+        })
+      }
+      return user;
+    })
+
+    
+    
     await createTokenAndSetCookie(user.id, res);
     res.status(201).json({
       success: true,
@@ -159,7 +182,9 @@ export const logout: RequestHandler = async (
   next: NextFunction
 ) => {
   try {
-    res.cookie("jwt", "", { maxAge: 0 });
+    console.log("logout hit")
+    res.clearCookie("jwt")
+
     res.status(200).json({ message: "Logout Successfully" });
   } catch (error) {
     console.log("Error in logout controller", error);
@@ -174,7 +199,7 @@ export const onboard: RequestHandler = async (
   next: NextFunction
 ) => {
   try {
-    const { userId, role, age, gender, education, experience } = req.body;
+    const { userId, role, age, gender, education, experience , location } = req.body;
 
     if (!userId || !role) {
       res.status(400).json({
@@ -246,6 +271,9 @@ export const onboard: RequestHandler = async (
               userId,
               age,
               gender: genderUser,
+              education: education,
+              experience: experience,
+              location: location,
             },
           });
           jobSeekerId = newJobSeeker.id;
@@ -254,19 +282,8 @@ export const onboard: RequestHandler = async (
         }
 
         // Create UserProfile if it doesn’t exist
-        const existingProfile = await tx.userProfile.findUnique({
-          where: { jobSeekerId },
-        });
+        
 
-        if (!existingProfile) {
-          await tx.userProfile.create({
-            data: {
-              jobSeekerId,
-              education: education || "",
-              experience: experience || "",
-            },
-          });
-        }
       });
       await createTokenAndSetCookie(userId, res);
 
@@ -280,6 +297,7 @@ export const onboard: RequestHandler = async (
           gender,
           education,
           experience,
+          location
         },
       });
       return;
@@ -295,6 +313,7 @@ export const onboard: RequestHandler = async (
     next(error);
   }
 };
+
 
 // /api/auth/onboard-extend -> POST
 export const onboardExtend: RequestHandler = async (

@@ -1,11 +1,11 @@
 import * as React from "react";
-import Navbar from "../shared/navbar";
+import Navbar from "../components/shared/navbar";
 import { Label } from "@radix-ui/react-label";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
+import { Input } from "../components/ui/input";
+import { Button } from "../components/ui/button";
 import axios from "axios";
 import { useUserStore } from "@/store/user";
-import { data } from "../../store/jobsAndSkills"
+import { data } from "../store/jobsAndSkills"
 import { TitleAndSkills } from "@/types/types";
 import { useNavigate } from "react-router-dom";
 //age is hardcoded to 25
@@ -119,7 +119,8 @@ const Signup = () => {
           age : 25, 
           gender : additionalInfo.gender, 
           education : additionalInfo.qualification, 
-          experience : additionalInfo.experience 
+          experience : additionalInfo.experience ,
+          location : additionalInfo.location
         } , {
           withCredentials : true
         });

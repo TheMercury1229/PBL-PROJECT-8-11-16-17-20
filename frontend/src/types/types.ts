@@ -19,3 +19,22 @@ export type TitleAndSkills = {
     title: string; // Job title from mlJob
     skills: string[]; // Selected skills from MLSKILLS
   };
+
+
+export interface JobState{
+    mlJobId: string;
+    jobRecruiterId: string;
+    title: string;
+    description: string;
+    location: string;
+    salaryRange : string;
+    preference : string;
+    qualification : string;
+    experience : string;    
+}
+
+export const roleValue = {
+    jobSeeker :"JOB_SEEKER",
+    jobRecruiter : "JOB_RECRUITER"
+}
+

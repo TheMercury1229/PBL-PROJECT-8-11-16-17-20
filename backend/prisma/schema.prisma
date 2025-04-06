@@ -22,26 +22,22 @@ model JobSeeker {
   id            String             @id @default(cuid())
   age           Int
   gender        UserGender
+  location      String
+  education     String
+  experience    String
   userId        String             @unique
   user          User               @relation(fields: [userId], references: [id])
   preferredJobs PreferredJob[]
-  profile       UserProfile?
   skills        UserSkillMapping[]
   appliedJobs   RecruiterJob[]     @relation("JobSeekerToRecruiterJob")
 }
 
-model UserProfile {
-  id          String    @id @default(cuid())
-  jobSeekerId String    @unique
-  education   String
-  experience  String
-  jobSeeker   JobSeeker @relation(fields: [jobSeekerId], references: [id])
-}
+
 
 model PreferredJob {
   id          String             @id @default(cuid())
   mlJobId     String
-  jobSeekerId String
+  jobSeekerId String  
   jobSeeker   JobSeeker          @relation(fields: [jobSeekerId], references: [id])
   mlJob       MLJob              @relation(fields: [mlJobId], references: [id])
   skills      UserSkillMapping[]

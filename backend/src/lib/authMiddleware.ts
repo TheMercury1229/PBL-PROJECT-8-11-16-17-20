@@ -5,6 +5,7 @@ import envObj from "../config/config";
 export const authMiddleware  =   (req:Request, res: Response , next : NextFunction) : void => {
   try {
     const token = req.cookies?.jwt;
+    console.log("token", token);
     if (!token) {
       console.log("no coookie");
       res.status(401).json({ data: null, message: "UNAUTHORIZED USER: No Token Found" });

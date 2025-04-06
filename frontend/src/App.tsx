@@ -1,13 +1,14 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "./components/home";
-import Signup from "./components/auth/signup";
-import Login from "./components/auth/login";
+import Home from "./pages/home";
+import Signup from "./pages/signup";
+
 import Jobs from "./components/ui/jobs";
 import Browse from "./components/browse";
 import Profile from "./components/ui/profile";
 import Jobdesc from "./components/ui/jobdesc";
-import RecJobs from "./components/ui/RecJobs";
+import RecJobs from "./pages/RecJobs";
 import InitUser from "./components/auth/InitUser";
+import Login from "./pages/login";
 
 function App() {
   return (

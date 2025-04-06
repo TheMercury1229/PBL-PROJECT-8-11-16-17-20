@@ -1,12 +1,13 @@
 import * as React from "react";
-import Navbar from "../shared/navbar";
 import { Label } from "@radix-ui/react-label";
-import { Input } from "../ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Button } from "../ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useUserStore } from "@/store/user";
+import Navbar from "@/components/shared/navbar";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+
 const Login = () => {
   const navigate = useNavigate();
   const [input, setInput] = React.useState({
@@ -29,7 +30,7 @@ const {
   const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:3000/api/auth/login", input , {
+      const response = await axios.post("http://localhost:3000/api/v1/auth/login", input , {
         withCredentials : true
       });
       setId(response.data.data.id);
