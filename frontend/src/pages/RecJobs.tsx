@@ -392,7 +392,7 @@ const RecJobs = () => {
   // Step 4: Review and Submit
   const renderReviewStep = () => {
     return (
-      <Card className="w-full max-w-xl">
+      <Card className="w-full max-w-5xl">
         <CardHeader>
           <CardTitle className="text-2xl">Review Job Details</CardTitle>
           <CardDescription>
