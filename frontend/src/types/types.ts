@@ -38,3 +38,14 @@ export const roleValue = {
     jobRecruiter : "JOB_RECRUITER"
 }
 
+export interface PreferredJobOutput {
+    recruiterjobid: string;
+    job_title: string,
+    skills: string;
+    salary_range: string;
+    location: string;
+    preference: string,
+    experience: string;
+    description : string;
+  }
+

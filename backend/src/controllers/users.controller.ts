@@ -18,7 +18,8 @@ interface PreferredJobOutput {
   salary_range: string;
   location: string;
   preference: string,
-  experience: string
+  experience: string;
+  description : string;
 }
 
 export const create: RequestHandler = async (req: Request, res: Response) => {

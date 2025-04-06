@@ -43,6 +43,7 @@ const {
       navigate("/")
     } catch (error) {
       alert("LOGIN FAILED")
+      console.log(error);
     }
     // console.log(input);
   };

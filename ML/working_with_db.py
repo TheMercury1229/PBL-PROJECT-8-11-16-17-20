@@ -33,7 +33,7 @@ engine.connect()
 # In[23]:
 
 
-query = """SELECT r."id" as recruiterJobId, mlj."title" AS job_title, 
+query = """SELECT r."id" as recruiterJobId, mlj."title" AS job_title, mlj."description" AS description,
               mlj."salary" AS salary_range,
                   STRING_AGG(mls."name", ' ') AS skills, 
                   r."location", r."preferance" as preference, r."experience", r."qualifications"
@@ -41,7 +41,7 @@ query = """SELECT r."id" as recruiterJobId, mlj."title" AS job_title,
            JOIN "MLJob" mlj ON mlj."id" = r."mlJobId"
            JOIN "RecruiterSkills" rsk ON rsk."recruiterJobId" = r."id"
            JOIN "MLSkill" mls ON mls."id" = rsk."skillId"
-           GROUP BY r."id", mlj."title", mlj."salary" , r."location", r."preferance", r."experience", r."qualifications";"""
+           GROUP BY r."id", mlj."title", mlj."salary" ,mlj."description" , r."location", r."preferance", r."experience", r."qualifications";"""
 df = pd.read_sql(query, engine)
 
 
@@ -155,7 +155,7 @@ def recommend_job(skills, experience, location, preference, top_n=30):
 
     top_indices = refined_scores.argsort()[-top_n:][::-1]
 
-    return df.iloc[top_indices][["recruiterjobid","job_title", "skills", "salary_range", "location", "preference", "experience"]]
+    return df.iloc[top_indices][["recruiterjobid","job_title", "skills", "salary_range", "location", "preference", "experience" , "description"]]
 
 
 # In[37]:

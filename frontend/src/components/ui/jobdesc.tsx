@@ -1,10 +1,12 @@
 import * as React from "react";
 import Navbar from "../shared/navbar";
 import { Button } from "./button";
-
+import { useLocation } from "react-router-dom";
+import { PreferredJobOutput } from "@/types/types";
 const JobDescription = () => {
   const isApplied = false; // Change to true if already applied
-
+  const location = useLocation();
+  const job = location.state as PreferredJobOutput;
   return (
     <div className="p-6">
       <Navbar />
@@ -14,20 +16,10 @@ const JobDescription = () => {
         <div className="flex items-center justify-between">
           <div>
             {/* Job Title */}
-            <h1 className="font-bold text-2xl mb-4">Frontend Developer</h1>
+            <h1 className="font-bold text-2xl mb-4">{job.job_title}</h1>
 
             {/* Job Details Badges */}
-            <div className="flex gap-3 flex-wrap">
-              <span className="text-blue-700 font-bold bg-blue-100 px-3 py-1 rounded-lg">
-                12 Positions
-              </span>
-              <span className="text-red-600 font-bold bg-red-100 px-3 py-1 rounded-lg">
-                Part Time
-              </span>
-              <span className="text-purple-700 font-bold bg-purple-100 px-3 py-1 rounded-lg">
-                24 LPA
-              </span>
-            </div>
+            
           </div>
 
           {/* Apply Now Button */}
@@ -44,32 +36,31 @@ const JobDescription = () => {
 
         {/* Job Description Section */}
         <div className="mt-6 border-t pt-4">
-          <h2 className="font-semibold text-lg">Job Description</h2>
+          <h2 className="font-semibold text-lg">{job.description}</h2>
 
           <div className="mt-2 space-y-2">
             <p>
-              <span className="font-semibold">Role: </span>Frontend Developer
+              <span className="font-semibold">Role: </span>{job.job_title}
             </p>
             <p>
-              <span className="font-semibold">Location: </span>Hyderabad
+              <span className="font-semibold">Location: </span>{job.location}
             </p>
             <p>
               <span className="font-semibold">Description: </span>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesentium
-              similique sed dolor!
+              {job.description}
             </p>
             <p>
-              <span className="font-semibold">Experience: </span>2 yrs
+              <span className="font-semibold">Experience: </span>{job.experience}
             </p>
             <p>
-              <span className="font-semibold">Salary: </span>12 LPA
+              <span className="font-semibold">Salary: </span>{job.salary_range}
             </p>
-            <p>
+            {/* <p>
               <span className="font-semibold">Total Applicants: </span>4
-            </p>
-            <p>
+            </p> */}
+            {/* <p>
               <span className="font-semibold">Posted Date: </span>17-07-2024
-            </p>
+            </p> */}
           </div>
         </div>
       </div>
