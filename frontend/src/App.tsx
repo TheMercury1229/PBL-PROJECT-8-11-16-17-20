@@ -9,6 +9,7 @@ import Jobdesc from "./components/ui/jobdesc";
 import RecJobs from "./pages/RecJobs";
 import InitUser from "./components/auth/InitUser";
 import Login from "./pages/login";
+import JobApplication from "./pages/JobApplication";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/browse" element={<Browse />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/jobdesc" element={<Jobdesc />} />
+        <Route path="/job-app" element={<JobApplication />} />
       </Routes>
     </>
   );
