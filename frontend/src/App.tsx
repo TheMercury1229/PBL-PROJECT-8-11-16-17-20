@@ -13,7 +13,7 @@ import Login from "./pages/login";
 function App() {
   return (
     <>
-      {/* <InitUser></InitUser> */}
+      <InitUser></InitUser>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/signup" element={<Signup />} />
