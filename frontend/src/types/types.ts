@@ -49,3 +49,23 @@ export interface PreferredJobOutput {
     description : string;
   }
 
+export interface JobWithApplications {
+    mlJob: {
+      title: string;
+      description: string;
+    };
+    applications: {
+      user: {
+        fullName: string;
+        mobile: string;
+        email: string;
+        jobSeeker: {
+          age: number;
+          gender: 'MALE' | 'FEMALE' | 'OTHER';
+          education: string;
+          experience: string;
+        };
+      };
+    }[];
+  }
+  

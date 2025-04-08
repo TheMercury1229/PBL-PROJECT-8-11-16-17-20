@@ -207,3 +207,44 @@ export const getPreferredJob: RequestHandler = async (req: Request, res: Respons
 }
 
 
+export const applyForJob : RequestHandler = async (req : Request , res :Response ) =>{
+  try {
+    const userId = req.headers["userId"] as string;
+    if(!userId) 
+    {
+      res.status(404).json({data : null , message : "USER NOT EXISTS"});
+    }
+    const user = await getUserById(userId);
+    if(!user)
+    {
+      res.status(404).json({data : null , message : "NO SUCH USER"});
+    }
+    const { recruiterJobId  } = req.body;
+    if(!recruiterJobId)
+    {
+      res.status(404).json({data : null , message : "provide a job"});
+    }
+    await db.$transaction(async (tx)=>{
+      const applied = await tx.application.findFirst({
+        where : {
+          userId : userId,
+          recruiterJobId : recruiterJobId
+        }
+      });
+      if(applied)
+      {
+        throw new Error("APPLIED")
+      }
+      await tx.application.create({
+        data : {
+          userId : userId , 
+          recruiterJobId : recruiterJobId
+        }
+      });
+    })
+    res.status(200).json({data : true , message : "APPLIED FOR JOB SUCCESSFULLy"})
+   } catch (error) {
+    console.log(error instanceof Error ? error.message : "INTERNAL SERVER ERROR");
+    res.status(404).json({data : null , message : error instanceof Error ? error.message : "INTERNAL SERVER ERROR"})
+  }
+}

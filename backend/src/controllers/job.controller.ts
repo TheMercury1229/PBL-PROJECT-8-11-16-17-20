@@ -4,6 +4,7 @@ import db from "../config/db";
 import { MLJobType, MLSkillsType, RecruiterJob } from "../types/types";
 import { describe } from "node:test";
 import { Preferance } from "@prisma/client";
+import { getUserById } from "../lib/getUserById";
 
 type Output = {
   job: MLJobType,
@@ -189,3 +190,68 @@ export const getJobTitlesAndSkills: RequestHandler = async (
     res.json({ data: output });
   } catch (error) {}
 };
+
+export const getAllJobsOfRecruiter: RequestHandler = async (req: Request, res: Response) => {
+  try {
+    const userId = req.headers["userId"] as string;
+
+    if (!userId) {
+       res.status(400).json({ data: null, message: "USER ID NOT PROVIDED" });
+    }
+
+    const user = await getUserById(userId);
+    if(!user)
+    {
+      res.status(404).json({data : null , message : "NO SUCH USER"});
+    }
+    // Get the JobRecruiter ID linked to this user
+    const recruiter = await db.jobRecruiter.findUnique({
+      where: {
+        userId: userId
+      },
+      select : {
+        recruiterJobs : {
+           select : {
+            mlJob : {
+              select : {
+                title : true,
+                description : true
+              }
+            },
+            applications : {
+              select : {
+                user : {
+                  select: {
+                  fullName : true , 
+                  mobile : true,
+                  email : true,
+                  jobSeeker : {
+                    select : {
+                      age : true,
+                      gender : true,
+                      education : true , 
+                      experience : true
+                    }
+                  }
+                }
+              }
+              }
+            }
+           },
+        }
+      },
+    });
+
+    if (!recruiter) {
+       res.status(404).json({ data: null, message: "RECRUITER NOT FOUND" });
+    }
+
+    res.status(200).json({ data: recruiter?.recruiterJobs, message: "JOBS FETCHED SUCCESSFULLY" });
+
+  } catch (error) {
+    console.error("Error fetching recruiter jobs:", error);
+    res.status(500).json({ data: null, message: "INTERNAL SERVER ERROR" });
+  }
+};
+
+

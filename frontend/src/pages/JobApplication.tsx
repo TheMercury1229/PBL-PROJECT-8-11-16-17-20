@@ -11,13 +11,11 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -32,7 +30,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import {
   Search,
@@ -43,114 +41,81 @@ import {
   AlertCircle,
   User,
 } from "lucide-react";
+import axios from "axios";
+import Navbar from "@/components/shared/navbar";
+
+// Using the interface defined at the bottom of the file
+interface JobWithApplications {
+  mlJob: {
+    title: string;
+    description: string;
+  };
+  applications: {
+    user: {
+      fullName: string;
+      mobile: string;
+      email: string;
+      jobSeeker: {
+        age: number;
+        gender: 'MALE' | 'FEMALE' | 'OTHER';
+        education: string;
+        experience: string;
+      };
+    };
+    status?: string; // Adding this as it appears to be used in the UI
+    match?: number; // Adding this as it appears to be used in the UI
+    date?: string; // Adding this as it appears to be used in the UI
+    id?: number; // Adding this as it appears to be used in the UI
+  }[];
+  id?: number; // Adding this as it appears to be used in the UI
+  status?: string; // Adding this as it appears to be used in the UI
+  department?: string; // Adding this as it appears to be used in the UI
+  location?: string; // Adding this as it appears to be used in the UI
+  applicationsCount?: number; // Adding this as it appears to be used in the UI
+}
 
 export default function JobApplication() {
-  // Sample data for demo purposes
-  const jobs = [
-    {
-      id: 1,
-      title: "Frontend Developer",
-      department: "Engineering",
-      location: "Remote",
-      status: "Active",
-      applicationsCount: 24,
-      applications: [
-        {
-          id: 101,
-          name: "Alex Johnson",
-          status: "Pending Review",
-          date: "2025-04-02",
-          experience: "5 years",
-          match: 85,
-        },
-        {
-          id: 102,
-          name: "Jamie Smith",
-          status: "Interviewed",
-          date: "2025-04-01",
-          experience: "3 years",
-          match: 72,
-        },
-        {
-          id: 103,
-          name: "Taylor Lee",
-          status: "Rejected",
-          date: "2025-03-28",
-          experience: "2 years",
-          match: 60,
-        },
-        {
-          id: 104,
-          name: "Morgan Richards",
-          status: "Offer Sent",
-          date: "2025-03-27",
-          experience: "7 years",
-          match: 95,
-        },
-      ],
-    },
-    {
-      id: 2,
-      title: "UX Designer",
-      department: "Design",
-      location: "New York",
-      status: "Active",
-      applicationsCount: 18,
-      applications: [
-        {
-          id: 201,
-          name: "Riley Cooper",
-          status: "Pending Review",
-          date: "2025-04-05",
-          experience: "4 years",
-          match: 78,
-        },
-        {
-          id: 202,
-          name: "Jordan White",
-          status: "Interviewed",
-          date: "2025-04-03",
-          experience: "6 years",
-          match: 88,
-        },
-      ],
-    },
-    {
-      id: 3,
-      title: "Product Manager",
-      department: "Product",
-      location: "San Francisco",
-      status: "Closed",
-      applicationsCount: 32,
-      applications: [
-        {
-          id: 301,
-          name: "Casey Brown",
-          status: "Hired",
-          date: "2025-03-20",
-          experience: "8 years",
-          match: 92,
-        },
-        {
-          id: 302,
-          name: "Sam Wilson",
-          status: "Rejected",
-          date: "2025-03-18",
-          experience: "5 years",
-          match: 75,
-        },
-        {
-          id: 303,
-          name: "Avery Green",
-          status: "Rejected",
-          date: "2025-03-17",
-          experience: "3 years",
-          match: 68,
-        },
-      ],
-    },
-  ];
+  const [jobs, setJobs] = React.useState<JobWithApplications[]>([]);
+  const [loading, setLoading] = React.useState(true);
 
+  React.useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/api/v1/jobs/get-jobs", {
+          withCredentials: true
+        });
+
+        // Transform the data to match the component's expected structure
+        const transformedData = response.data.data.map(job => ({
+          ...job,
+          // Ensure job has all the properties used in the UI
+          id: job.id || Math.random(),
+          status: job.status || "Active",
+          department: job.department || "N/A",
+          location: job.location || "N/A",
+          applicationsCount: job.applications?.length || 0,
+          applications: job.applications?.map(app => ({
+            ...app,
+            // Add UI-required fields mapped from the API response
+            id: app.id || Math.random(),
+            name: app.user?.fullName || "Unknown",
+            status: app.status || "Pending Review",
+            date: app.date || new Date().toLocaleDateString(),
+            experience: app.user?.jobSeeker?.experience || "N/A",
+            match: app.match || Math.floor(Math.random() * 100)
+          })) || []
+        }));
+
+        setJobs(transformedData);
+        setLoading(false);
+      } catch (err: any) {
+        console.error("Error fetching jobs:", err);
+        setLoading(false);
+      }
+    };
+
+    fetchJobs();
+  }, []);
   const [selectedApplicant, setSelectedApplicant] = useState<{
     id: number;
     name: string;
@@ -158,8 +123,23 @@ export default function JobApplication() {
     date: string;
     experience: string;
     match: number;
+    user?: {
+      fullName: string;
+      mobile: string;
+      email: string;
+      jobSeeker: {
+        age: number;
+        gender: 'MALE' | 'FEMALE' | 'OTHER';
+        education: string;
+        experience: string;
+      };
+    };
   } | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
+
+  if (loading) return <div>Loading jobs...</div>;
+
+  
 
   const getStatusBadge = (status) => {
     const statusMap = {
@@ -206,6 +186,8 @@ export default function JobApplication() {
   };
 
   return (
+    <>
+    <Navbar></Navbar>
     <div className="container mx-auto py-6 max-w-6xl">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Job Applications</h1>
@@ -239,7 +221,7 @@ export default function JobApplication() {
                       <AccordionTrigger className="px-6 py-4">
                         <div className="flex flex-1 justify-between items-center">
                           <div>
-                            <CardTitle>{job.title}</CardTitle>
+                            <CardTitle>{job.mlJob?.title || "Untitled Position"}</CardTitle>
                             <CardDescription className="flex gap-2 mt-1">
                               <Badge variant="outline">{job.department}</Badge>
                               <Badge variant="outline">{job.location}</Badge>
@@ -272,17 +254,17 @@ export default function JobApplication() {
                                     <div className="flex items-center gap-2">
                                       <Avatar className="h-8 w-8">
                                         <AvatarFallback>
-                                          {applicant.name.charAt(0)}
+                                          {applicant.user?.fullName?.charAt(0) || "U"}
                                         </AvatarFallback>
                                       </Avatar>
-                                      {applicant.name}
+                                      {applicant.user?.fullName || "Unknown"}
                                     </div>
                                   </TableCell>
                                   <TableCell>
                                     {getStatusBadge(applicant.status)}
                                   </TableCell>
                                   <TableCell>{applicant.date}</TableCell>
-                                  <TableCell>{applicant.experience}</TableCell>
+                                  <TableCell>{applicant.user?.jobSeeker?.experience || "N/A"}</TableCell>
                                   <TableCell>
                                     <div className="flex items-center gap-2">
                                       <div className="w-16 bg-gray-200 rounded-full h-2">
@@ -330,7 +312,7 @@ export default function JobApplication() {
                       <AccordionTrigger className="px-6 py-4">
                         <div className="flex flex-1 justify-between items-center">
                           <div>
-                            <CardTitle>{job.title}</CardTitle>
+                            <CardTitle>{job.mlJob?.title || "Untitled Position"}</CardTitle>
                             <CardDescription className="flex gap-2 mt-1">
                               <Badge variant="outline">{job.department}</Badge>
                               <Badge variant="outline">{job.location}</Badge>
@@ -363,17 +345,17 @@ export default function JobApplication() {
                                     <div className="flex items-center gap-2">
                                       <Avatar className="h-8 w-8">
                                         <AvatarFallback>
-                                          {applicant.name.charAt(0)}
+                                          {applicant.user?.fullName?.charAt(0) || "U"}
                                         </AvatarFallback>
                                       </Avatar>
-                                      {applicant.name}
+                                      {applicant.user?.fullName || "Unknown"}
                                     </div>
                                   </TableCell>
                                   <TableCell>
                                     {getStatusBadge(applicant.status)}
                                   </TableCell>
                                   <TableCell>{applicant.date}</TableCell>
-                                  <TableCell>{applicant.experience}</TableCell>
+                                  <TableCell>{applicant.user?.jobSeeker?.experience || "N/A"}</TableCell>
                                   <TableCell>
                                     <div className="flex items-center gap-2">
                                       <div className="w-16 bg-gray-200 rounded-full h-2">
@@ -419,7 +401,7 @@ export default function JobApplication() {
                     <AccordionTrigger className="px-6 py-4">
                       <div className="flex flex-1 justify-between items-center">
                         <div>
-                          <CardTitle>{job.title}</CardTitle>
+                          <CardTitle>{job.mlJob?.title || "Untitled Position"}</CardTitle>
                           <CardDescription className="flex gap-2 mt-1">
                             <Badge variant="outline">{job.department}</Badge>
                             <Badge variant="outline">{job.location}</Badge>
@@ -461,17 +443,17 @@ export default function JobApplication() {
                                   <div className="flex items-center gap-2">
                                     <Avatar className="h-8 w-8">
                                       <AvatarFallback>
-                                        {applicant.name.charAt(0)}
+                                        {applicant.user?.fullName?.charAt(0) || "U"}
                                       </AvatarFallback>
                                     </Avatar>
-                                    {applicant.name}
+                                    {applicant.user?.fullName || "Unknown"}
                                   </div>
                                 </TableCell>
                                 <TableCell>
                                   {getStatusBadge(applicant.status)}
                                 </TableCell>
                                 <TableCell>{applicant.date}</TableCell>
-                                <TableCell>{applicant.experience}</TableCell>
+                                <TableCell>{applicant.user?.jobSeeker?.experience || "N/A"}</TableCell>
                                 <TableCell>
                                   <div className="flex items-center gap-2">
                                     <div className="w-16 bg-gray-200 rounded-full h-2">
@@ -514,7 +496,7 @@ export default function JobApplication() {
               <DialogHeader>
                 <DialogTitle className="text-xl">Applicant Profile</DialogTitle>
                 <DialogDescription>
-                  Review application details for {selectedApplicant.name}
+                  Review application details for {selectedApplicant.user?.fullName || selectedApplicant.name}
                 </DialogDescription>
               </DialogHeader>
 
@@ -522,11 +504,11 @@ export default function JobApplication() {
                 <div className="col-span-4 flex flex-col items-center">
                   <Avatar className="h-24 w-24">
                     <AvatarFallback className="text-xl">
-                      {selectedApplicant.name.charAt(0)}
+                      {selectedApplicant.user?.fullName?.charAt(0) || selectedApplicant.name?.charAt(0) || "U"}
                     </AvatarFallback>
                   </Avatar>
                   <h3 className="mt-2 font-semibold text-lg">
-                    {selectedApplicant.name}
+                    {selectedApplicant.user?.fullName || selectedApplicant.name}
                   </h3>
                   <p className="text-sm text-gray-500">
                     Applied on {selectedApplicant.date}
@@ -572,9 +554,24 @@ export default function JobApplication() {
                             EXPERIENCE
                           </h4>
                           <p>
-                            {selectedApplicant.experience} of industry
+                            {selectedApplicant.user?.jobSeeker?.experience || selectedApplicant.experience || "N/A"} of industry
                             experience
                           </p>
+                        </div>
+
+                        <div>
+                          <h4 className="font-medium text-sm text-gray-500">
+                            EDUCATION
+                          </h4>
+                          <p>{selectedApplicant.user?.jobSeeker?.education || "Bachelor's in Computer Science"}</p>
+                        </div>
+
+                        <div>
+                          <h4 className="font-medium text-sm text-gray-500">
+                            CONTACT
+                          </h4>
+                          <p>Email: {selectedApplicant.user?.email || "N/A"}</p>
+                          <p>Phone: {selectedApplicant.user?.mobile || "N/A"}</p>
                         </div>
 
                         <div>
@@ -588,16 +585,6 @@ export default function JobApplication() {
                             <Badge variant="outline">Problem Solving</Badge>
                             <Badge variant="outline">Team Leadership</Badge>
                           </div>
-                        </div>
-
-                        <div>
-                          <h4 className="font-medium text-sm text-gray-500">
-                            EDUCATION
-                          </h4>
-                          <p>Bachelor's in Computer Science</p>
-                          <p className="text-sm text-gray-500">
-                            University of Technology (2018-2022)
-                          </p>
                         </div>
                       </div>
                     </TabsContent>
@@ -654,5 +641,6 @@ export default function JobApplication() {
         </DialogContent>
       </Dialog>
     </div>
+    </>
   );
 }
